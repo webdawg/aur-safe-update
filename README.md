@@ -27,10 +27,41 @@ All candidate packages are checked before the helper starts. One blocked package
 
 - Arch Linux or an Arch-based system with `pacman`
 - Bash 4 or newer
-- One supported AUR helper: `paru` or `yay` (`paru` is preferred when both exist)
 - `curl`
 - `jq`
+- `vercmp` from `pacman`
 - GNU `date` from `coreutils`
+
+## Manual-check command
+
+This fork also provides `aur-safe-update-manual`. It only lists installed AUR
+packages with pending upgrades, checks each package with AURWatch, verifies
+that the scan covers the current AUR recipe, and prints the results. It never
+runs `paru -Syu`, `yay -Syu`, `pacman -S`, `sudo`, or any other update command.
+
+```bash
+aur-safe-update-manual
+```
+
+Exit status is `0` when the check completes without blocking findings, `3` for
+a blocking finding or failed required check, and `4` when manual review is
+required. AUR API errors and unknown verdicts are blocking by default; set
+`AURWATCH_FAIL_OPEN=1` to report those as review-required instead.
+
+The command uses `pacman -Qmq` to find installed foreign packages, queries
+current versions directly from the public AUR RPC, and compares versions with
+`vercmp`. It does not require, install, or invoke `paru` or `yay`.
+
+## Building and installing the manual package
+
+From this repository on an Arch Linux system:
+
+```bash
+makepkg -si
+```
+
+The package installs only `/usr/bin/aur-safe-update-manual`. It does not
+install or replace `aur-safe-update`.
 
 ## Installation
 
